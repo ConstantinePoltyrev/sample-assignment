@@ -1,17 +1,21 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import * as mongodb from 'mongo-mock';
+import ObjectID from 'bson-objectid';
+import * as path from 'path';
+mongodb.MongoClient.persist = path.join(__dirname, 'mongo.js');
 
 @Injectable()
 export class DatabaseService implements OnModuleInit, OnModuleDestroy {
-  mongo = mongodb.MongoClient;
   client: mongodb.Db;
 
-  constructor() {
-    this.mongo.persist = 'mongo.js';
-  }
-
   async onModuleInit() {
-    this.client = await this.mongo.connect(
+    try {
+      await mongodb.MongoClient.load();
+    } catch (e) {
+      console.error(e);
+    }
+
+    this.client = await mongodb.MongoClient.connect(
       'mongodb://localhost:27017/sampledb',
     );
   }
@@ -27,7 +31,7 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
 
   findById(table, id: string) {
     const collection = this.client.collection(table);
-    return collection.findOne({ _id: id });
+    return collection.findOne({ _id: new ObjectID(id) });
   }
 
   find(table, query) {
@@ -37,12 +41,12 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
 
   update(table, id, data) {
     const collection = this.client.collection(table);
-    return collection.updateOne({ _id: id }, { $set: data });
+    return collection.updateOne({ _id: new ObjectID(id) }, { $set: data });
   }
 
   delete(table, id) {
     const collection = this.client.collection(table);
-    return collection.removeOne({ _id: id });
+    return collection.removeOne({ _id: new ObjectID(id) });
   }
 
   deleteMany(table, query) {

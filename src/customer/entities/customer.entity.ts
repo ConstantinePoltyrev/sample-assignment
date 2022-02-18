@@ -11,19 +11,19 @@ export class Customer {
   @ApiProperty()
   @IsString()
   _id: string;
-  @ApiProperty()
+  @ApiProperty({ example: 'John' })
   @IsNotEmpty()
   @IsString()
   firstName: string;
-  @ApiProperty()
+  @ApiProperty({ example: 'Doe' })
   @IsNotEmpty()
   @IsString()
   lastName: string;
-  @ApiProperty()
+  @ApiProperty({ example: '+6062228834' })
   @IsNotEmpty()
   @IsPhoneNumber('US')
   phone: string;
-  @ApiProperty()
+  @ApiProperty({ example: 'jdoe@nowhere.com' })
   @IsNotEmpty()
   @IsEmail()
   email: string;

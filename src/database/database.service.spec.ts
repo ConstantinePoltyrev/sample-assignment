@@ -43,11 +43,10 @@ describe('DatabaseService', () => {
   });
   it('should delete a record', async () => {
     const res = await service.delete('test', docId);
-    expect(res.result.ok).toEqual(1);
+    expect(res.deletedCount).toEqual(1);
   });
   it('should delete many records', async () => {
     const res = await service.deleteMany('test', { age: { $gt: 25 } });
-    console.log(res);
     expect(res.deletedCount).toEqual(2);
   });
 });

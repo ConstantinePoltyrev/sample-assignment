@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { DatabaseService } from '../database/database.service';
@@ -16,17 +16,22 @@ export class CustomerService {
     return this.db.find(this.table, {});
   }
 
-  findOne(id: string) {
-    return this.db.findById(this.table, id);
+  async findOne(id: string) {
+    const res = await this.db.findById(this.table, id);
+    if (!res) {
+      throw new NotFoundException();
+    }
+    return res;
   }
 
-  update(id: string, updateCustomerDto: UpdateCustomerDto) {
-    return this.db.update(this.table, id, updateCustomerDto);
+  async update(id: string, updateCustomerDto: UpdateCustomerDto) {
+    await this.db.update(this.table, id, updateCustomerDto);
+    return this.db.findById(this.table, id);
   }
 
   async remove(id: string) {
     await this.db.deleteMany('accounts', { customerId: id });
-    return this.db.delete(this.table, id);
+    await this.db.delete(this.table, id);
   }
 
   getAccounts(id: string) {
